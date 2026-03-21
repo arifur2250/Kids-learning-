@@ -47,17 +47,18 @@ text-align:center;
 font-size:14px;
 }
 
-/* 🔥 FIXED 5 COLUMN */
+/* 🔢 Number Grid */
 .grid{
 flex:1;
 display:grid;
-grid-template-columns:repeat(5,1fr); /* ✅ always 5 */
+grid-template-columns:repeat(5,1fr);
 gap:10px;
 padding:10px;
+padding-bottom:90px; /* 🔥 space for quiz */
 overflow:auto;
 }
 
-/* 🔢 Number Button */
+/* Number Button */
 .number{
 background:#2196f3;
 color:white;
@@ -69,12 +70,11 @@ cursor:pointer;
 transition:0.2s;
 }
 
-/* 🎉 Hover Effect */
 .number:hover{
 transform:scale(1.1);
 }
 
-/* 🔥 Bounce Animation */
+/* Animation */
 .bounce{
 animation:bounceGlow 0.6s;
 }
@@ -86,50 +86,56 @@ animation:bounceGlow 0.6s;
 100%{transform:scale(1);}
 }
 
-/* Quiz Bottom */
+/* 🔥 Quiz Bottom (compact) */
 .quizBox{
 position:fixed;
 bottom:0;
 left:0;
 width:100%;
 background:white;
-padding:10px;
+padding:6px;
 box-shadow:0 -2px 10px rgba(0,0,0,0.2);
 text-align:center;
 }
 
 /* Text */
 #progress{
-font-size:14px;
+font-size:13px;
+margin:2px;
 }
 
 #question{
-font-size:18px;
+font-size:16px;
 font-weight:bold;
+margin:2px;
 }
 
-/* Options */
+/* ✅ ALWAYS 4 BUTTON */
 .quizOptions{
-display:flex;
-justify-content:center;
-gap:10px;
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:6px;
+max-width:320px;
+margin:0 auto;
 }
 
+/* Buttons */
 .quizOptions button{
-width:60px;
-height:60px;
+width:100%;
+aspect-ratio:1/1;
 border:none;
-border-radius:12px;
+border-radius:10px;
 background:#03a9f4;
 color:white;
-font-size:20px;
+font-size:clamp(14px,4vw,20px);
 font-weight:bold;
 }
 
 /* Result */
 #result{
-font-size:15px;
+font-size:14px;
 font-weight:bold;
+margin-top:3px;
 }
 
 </style>
@@ -163,7 +169,7 @@ let volume=document.getElementById("volume");
 
 let lastNumber=null;
 
-// 🔊 Voice
+// Voice
 function speak(text){
 let msg=new SpeechSynthesisUtterance(text);
 msg.volume=volume.value;
@@ -171,7 +177,7 @@ speechSynthesis.cancel();
 speechSynthesis.speak(msg);
 }
 
-// 🔢 Numbers (with animation)
+// Numbers
 for(let i=1;i<=100;i++){
 let div=document.createElement("div");
 div.className="number";
@@ -180,7 +186,6 @@ div.innerText=i;
 div.onclick=function(){
 lastNumber=i;
 
-// 🎉 animation
 div.classList.add("bounce");
 setTimeout(()=>div.classList.remove("bounce"),600);
 
@@ -190,19 +195,17 @@ speak(i);
 grid.appendChild(div);
 }
 
-// 🔁 Replay
+// Replay
 function replay(){
 if(lastNumber) speak(lastNumber);
 }
 
-// 🏠 Home
+// Home
 function goHome(){
 location.href="index.html";
 }
 
-//////////////////////////////////////////
-// 🧠 QUIZ
-
+// QUIZ
 let total=20;
 let current=1;
 let score=0;
@@ -275,7 +278,6 @@ document.getElementById("result").innerText=
 
 }
 
-// start
 newQuiz();
 
 </script>
