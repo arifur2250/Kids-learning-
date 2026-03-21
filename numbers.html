@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 <title>Numbers Learning</title>
 
@@ -13,6 +13,10 @@ font-family:Arial;
 margin:0;
 background:#e3f2fd;
 text-align:center;
+overflow:hidden;
+height:100vh;
+display:flex;
+flex-direction:column;
 }
 
 /* 🔙 Back Button */
@@ -23,93 +27,123 @@ left:10px;
 background:#ff5722;
 color:white;
 border:none;
-padding:10px 15px;
+padding:8px 12px;
 border-radius:10px;
-font-size:16px;
-cursor:pointer;
-box-shadow:0 2px 5px rgba(0,0,0,0.3);
+font-size:14px;
 z-index:1000;
 }
 
+/* Header */
 header{
 background:#ff5722;
 color:white;
-padding:15px;
-font-size:40px;
+padding:10px;
+font-size:clamp(20px,5vw,40px);
 }
 
+/* Controls */
 .controls{
 background:white;
-padding:10px;
-box-shadow:0 2px 5px rgba(0,0,0,0.2);
+padding:8px;
 }
 
+/* 🔥 GRID SMALLER */
 .grid{
 display:grid;
-grid-template-columns:repeat(3,1fr);
-gap:10px;
+grid-template-columns:repeat(5,1fr);
+gap:8px;
 padding:10px;
+
+/* ✅ reduce height */
+height:35vh;
+overflow:auto;
 }
 
+/* 🔢 Number Button BIGGER */
 .number{
 background:#2196f3;
 color:white;
 padding:18px;
 border-radius:15px;
 cursor:pointer;
-font-size:100px;
-transition:0.3s;
+font-size:clamp(20px,5vw,42px);
 }
 
-.number:hover{
-background:#ff9800;
-transform:scale(1.1);
-}
-
+/* 🔥 Animation */
 .bounce{
-animation:bounce 0.4s;
+animation:superBounce 0.6s;
 }
 
-@keyframes bounce{
+@keyframes superBounce{
 0%{transform:scale(1);}
-50%{transform:scale(1.3);}
+30%{transform:scale(1.5) rotate(5deg); box-shadow:0 0 15px #ffeb3b;}
+60%{transform:scale(0.85) rotate(-5deg); box-shadow:0 0 25px #ff9800;}
 100%{transform:scale(1);}
 }
 
+/* 🧠 QUIZ (FIXED HEIGHT) */
 .quizBox{
 background:white;
 margin:10px;
 padding:15px;
 border-radius:10px;
+flex:1;
+display:flex;
+flex-direction:column;
+justify-content:center;
+}
+
+/* Effects */
+.correctFlash{
+animation:flashGreen 0.5s;
+}
+@keyframes flashGreen{
+0%{background:#c8e6c9;}
+100%{background:white;}
+}
+
+.wrongShake{
+animation:shake 0.4s;
+}
+@keyframes shake{
+0%{transform:translateX(0);}
+25%{transform:translateX(-8px);}
+50%{transform:translateX(8px);}
+75%{transform:translateX(-8px);}
+100%{transform:translateX(0);}
+}
+
+/* 🔘 BIG QUIZ BUTTONS */
+.quizOptions{
+display:grid;
+grid-template-columns:repeat(2,1fr);
+gap:10px;
 }
 
 .quizOptions button{
 background:#03a9f4;
 color:white;
 border:none;
-border-radius:8px;
-padding:10px;
-margin:5px;
-cursor:pointer;
+border-radius:10px;
+padding:15px;
+font-size:20px;
 }
 
+/* Result */
 #result{
-font-size:18px;
+font-size:20px;
 margin-top:10px;
+font-weight:bold;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<!-- 🏠 Back Button -->
 <button class="homeBtn" onclick="goHome()">🏠 Home</button>
 
-<header>
-🔢 Numbers 1-100
-</header>
+<header>🔢 Numbers 1-100</header>
 
 <div class="controls">
 Volume
@@ -119,52 +153,60 @@ Volume
 
 <div class="grid" id="numbers"></div>
 
-<!-- Quiz -->
-<div class="quizBox">
-<h3>🧠 Smart Quiz</h3>
+<!-- 🧠 QUIZ -->
+<div class="quizBox" id="quizBox">
+<h3>🧠 Exam Mode</h3>
 <p id="question"></p>
 
 <div class="quizOptions" id="options"></div>
 
 <p id="result"></p>
+<p id="score"></p>
 </div>
+
+<audio id="correctSound" src="correct.mp3"></audio>
+<audio id="wrongSound" src="wrong.mp3"></audio>
 
 <script>
 
 let grid=document.getElementById("numbers");
 let volume=document.getElementById("volume");
+let quizBox=document.getElementById("quizBox");
 
 let lastNumber=null;
 
 // 🔊 Voice
 function speak(text){
-let msg = new SpeechSynthesisUtterance(text);
-msg.lang = "en-US";
-msg.volume = volume.value;
+let msg=new SpeechSynthesisUtterance(text);
+msg.lang="en-US";
+msg.volume=volume.value;
 speechSynthesis.cancel();
 speechSynthesis.speak(msg);
 }
 
-// 🔢 Numbers create
-for(let i=1;i<=100;i++){
+// 🔊 Sound
+function playSound(type){
+let sound=document.getElementById(type+"Sound");
+if(sound){
+sound.currentTime=0;
+sound.play();
+}
+}
 
+// 🔢 Numbers
+for(let i=1;i<=100;i++){
 let div=document.createElement("div");
 div.className="number";
 div.innerText=i;
 
 div.onclick=function(){
-
 lastNumber=i;
 div.classList.add("bounce");
-
 speak(i);
-
-setTimeout(()=>div.classList.remove("bounce"),400);
-
+setTimeout(()=>div.classList.remove("bounce"),600);
 };
 
 grid.appendChild(div);
-
 }
 
 // 🔁 Replay
@@ -174,64 +216,104 @@ speak(lastNumber);
 }
 }
 
-// 🏠 Back to Home
+// 🏠 Home
 function goHome(){
 window.location.href="index.html";
 }
 
 //////////////////////////////////////////////////
-// 🧠 SMART QUIZ
+// 🧠 QUIZ
 
 let correct;
+let questionCount=0;
+let score=0;
+let total=10;
 
 function newQuiz(){
 
-let q = Math.floor(Math.random()*10)+1;
-correct = q;
+if(questionCount>=total){
+endExam();
+return;
+}
 
-document.getElementById("question").innerText = "Find number: " + q;
-document.getElementById("result").innerText = "";
+questionCount++;
 
-// 🔊 Voice Question
+let q=Math.floor(Math.random()*100)+1;
+correct=q;
+
+document.getElementById("question").innerText=
+"Q"+questionCount+": Find "+q;
+
+document.getElementById("result").innerText="";
+document.getElementById("score").innerText=
+"Score: "+score+" / "+total;
+
 speak(q);
 
-// options generate
-let optionsDiv = document.getElementById("options");
+// options
+let options=[q];
+while(options.length<4){
+let n=Math.floor(Math.random()*100)+1;
+if(!options.includes(n)) options.push(n);
+}
+options=options.sort(()=>Math.random()-0.5);
+
+let optionsDiv=document.getElementById("options");
 optionsDiv.innerHTML="";
 
-let options = [q, q+1, q-1];
-options = options.sort(()=>0.5-Math.random());
-
 options.forEach(opt=>{
-  if(opt < 1) return;
+let btn=document.createElement("button");
+btn.innerText=opt;
 
-  let btn = document.createElement("button");
-  btn.innerText = opt;
+btn.onclick=function(){
+checkAns(opt);
+};
 
-  btn.onclick = function(){
-    checkAns(opt);
-  }
-
-  optionsDiv.appendChild(btn);
+optionsDiv.appendChild(btn);
 });
-
 }
 
 function checkAns(ans){
 
-if(ans == correct){
+if(ans==correct){
+
+score++;
 document.getElementById("result").innerText="✅ Correct!";
+playSound("correct");
 speak("Correct");
+
+quizBox.classList.add("correctFlash");
+setTimeout(()=>quizBox.classList.remove("correctFlash"),500);
+
+setTimeout(newQuiz,800);
+
 }else{
-document.getElementById("result").innerText="❌ Wrong! Answer: " + correct;
+
+document.getElementById("result").innerText="❌ Try Again!";
+playSound("wrong");
 speak("Wrong");
+
+quizBox.classList.add("wrongShake");
+setTimeout(()=>quizBox.classList.remove("wrongShake"),400);
 }
 
-setTimeout(newQuiz,1200);
+}
+
+function endExam(){
+
+document.getElementById("question").innerText="🎉 Finished!";
+document.getElementById("options").innerHTML="";
+
+let msg="";
+if(score>=8) msg="🌟 Excellent!";
+else if(score>=5) msg="👍 Good!";
+else msg="📚 Practice More!";
+
+document.getElementById("result").innerText=
+"Final Score: "+score+" / "+total+" "+msg;
 
 }
 
-// start
 newQuiz();
 
 </script>
