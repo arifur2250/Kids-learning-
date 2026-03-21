@@ -1,3 +1,5 @@
+
+}
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,60 +9,104 @@
 <title>Kids Learning App</title>
 
 <style>
-
-body{
-margin:0;
-font-family:Arial;
-background:#f0f8ff;
+/* Global Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 
-header{
-background:#ff5722;
-color:white;
-text-align:center;
-padding:15px;
-font-size:24px;
+body {
+  font-family: 'Poppins', Arial, sans-serif;
+  background: linear-gradient(135deg, #a1c4fd, #c2e9fb);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.menu{
-
-display:grid;
-grid-template-columns:repeat(2,1fr);
-gap:15px;
-padding:15px;
-
+/* Header */
+header {
+  background: linear-gradient(90deg, #ff6a00, #ee0979);
+  color: white;
+  text-align: center;
+  padding: 20px;
+  font-size: 26px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.2);
 }
 
-.card{
-
-background:white;
-padding:25px;
-border-radius:15px;
-text-align:center;
-font-size:18px;
-font-weight:bold;
-box-shadow:0 3px 8px rgba(0,0,0,0.2);
-cursor:pointer;
-transition:0.3s;
-
+/* Menu Grid */
+.menu {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 20px;
+  padding: 20px;
+  flex: 1;
 }
 
-.card:hover{
-transform:scale(1.05);
-background:#e3f2fd;
+/* Cards */
+.card {
+  background: white;
+  padding: 25px 15px;
+  border-radius: 20px;
+  text-align: center;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
 }
 
-.footer{
-text-align:center;
-padding:10px;
-font-size:14px;
-color:#555;
+/* Card Hover Colors */
+.card.numbers:hover { background: linear-gradient(135deg, #ff9a9e, #fad0c4); }
+.card.alphabet:hover { background: linear-gradient(135deg, #a18cd1, #fbc2eb); }
+.card.bangla:hover { background: linear-gradient(135deg, #f6d365, #fda085); }
+.card.math:hover { background: linear-gradient(135deg, #96fbc4, #f9f586); }
+.card.puzzle:hover { background: linear-gradient(135deg, #84fab0, #8fd3f4); }
+.card.writing:hover { background: linear-gradient(135deg, #fccb90, #d57eeb); }
+.card.quiz:hover { background: linear-gradient(135deg, #ffecd2, #fcb69f); }
+.card.games:hover { background: linear-gradient(135deg, #a1c4fd, #c2e9fb); }
+
+/* Card Icons */
+.card::before {
+  content: attr(data-icon);
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 
+/* Footer */
+.footer {
+  text-align: center;
+  padding: 15px;
+  font-size: 14px;
+  color: #555;
+  background: rgba(255,255,255,0.2);
+}
+
+/* Responsive */
+@media (max-width: 480px){
+  header {
+    font-size: 22px;
+    padding: 15px;
+  }
+
+  .card {
+    font-size: 16px;
+    padding: 20px 10px;
+  }
+
+  .card::before {
+    font-size: 35px;
+  }
+}
 </style>
 
 </head>
-
 <body>
 
 <header>
@@ -69,49 +115,38 @@ color:#555;
 
 <div class="menu">
 
-<div class="card" onclick="openPage('numbers')">🔢 Numbers</div>
-<div class="card" onclick="openPage('alphabet')">🔤 Alphabet</div>
-<div class="card" onclick="openPage('bangla')">🔡 বাংলা</div>
-<div class="card" onclick="openPage('math')">➕ Math</div>
-<div class="card" onclick="openPage('games')">🎮 Games</div>
-<div class="card" onclick="openPage('quiz')">🧠 Quiz</div>
+<!-- Step-by-Step Learning Sequence -->
+<div class="card numbers" onclick="openPage('numbers')" data-icon="🔢">Numbers</div>
+<div class="card alphabet" onclick="openPage('alphabet')" data-icon="🔤">Alphabet</div>
+<div class="card bangla" onclick="openPage('bangla')" data-icon="🔡">বাংলা</div>
+<div class="card math" onclick="openPage('math')" data-icon="➕">Math</div>
+<div class="card puzzle" onclick="openPage('puzzle')" data-icon="🧩">Puzzle</div>
+<div class="card writing" onclick="openPage('writing')" data-icon="✍️">Writing</div>
+<div class="card quiz" onclick="openPage('quiz')" data-icon="🧠">Quiz</div>
+<div class="card games" onclick="openPage('games')" data-icon="🎮">Games</div>
+
+<!-- Future / Placeholder Pages -->
+<div class="card" onclick="openPage('science')" data-icon="🧪">Science</div>
+<div class="card" onclick="openPage('story')" data-icon="📖">Story</div>
+<div class="card" onclick="openPage('music')" data-icon="🎵">Music</div>
+<div class="card" onclick="openPage('drawing')" data-icon="🎨">Drawing</div>
+<div class="card" onclick="openPage('colors')" data-icon="🌈">Colors</div>
+<div class="card" onclick="openPage('animals')" data-icon="🐾">Animals</div>
 
 </div>
 
 <div class="footer">
-Offline Kids Learning App
+Offline Kids Learning App | Designed for ages 5-10
 </div>
 
 <script>
-
 function openPage(page){
-
-if(page==="numbers"){
-window.location="numbers.html";
+  window.location = page + ".html";
 }
+</script>
 
-if(page==="alphabet"){
-window.location="alphabet.html";
-}
-
-if(page==="bangla"){
-window.location="bangla.html";
-}
-
-if(page==="math"){
-window.location="math.html";
-}
-
-if(page==="games"){
-window.location="games.html";
-}
-
-if(page==="quiz"){
-window.location="quiz.html";
-}
-
-}
-
+</body>
+</html>
 </script>
 
 </body>
