@@ -2,24 +2,32 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Numbers Learning</title>
+<title>Numbers Learning Pro</title>
 
 <style>
 
 body{
-font-family:Arial;
 margin:0;
+font-family:Arial;
 background:#e3f2fd;
-text-align:center;
-overflow:hidden;
-height:100vh;
 display:flex;
 flex-direction:column;
+height:100vh;
+overflow:hidden;
 }
 
-/* 🔙 Back Button */
+/* Header */
+header{
+background:#ff5722;
+color:white;
+text-align:center;
+padding:10px;
+font-size:clamp(20px,5vw,35px);
+}
+
+/* Home */
 .homeBtn{
 position:fixed;
 top:10px;
@@ -29,110 +37,83 @@ color:white;
 border:none;
 padding:8px 12px;
 border-radius:10px;
-font-size:14px;
-z-index:1000;
-}
-
-/* Header */
-header{
-background:#ff5722;
-color:white;
-padding:10px;
-font-size:clamp(20px,5vw,40px);
 }
 
 /* Controls */
 .controls{
 background:white;
-padding:8px;
+padding:5px;
+text-align:center;
+font-size:14px;
 }
 
-/* 🔥 GRID SMALLER */
+/* Grid */
 .grid{
+flex:1;
 display:grid;
-grid-template-columns:repeat(5,1fr);
+grid-template-columns:repeat(auto-fit,minmax(60px,1fr));
 gap:8px;
 padding:10px;
-
-/* ✅ reduce height */
-height:35vh;
 overflow:auto;
 }
 
-/* 🔢 Number Button BIGGER */
 .number{
 background:#2196f3;
 color:white;
-padding:18px;
+padding:20px;
 border-radius:15px;
-cursor:pointer;
-font-size:clamp(20px,5vw,42px);
+text-align:center;
+font-size:clamp(18px,5vw,35px);
 }
 
-/* 🔥 Animation */
-.bounce{
-animation:superBounce 0.6s;
-}
-
-@keyframes superBounce{
-0%{transform:scale(1);}
-30%{transform:scale(1.5) rotate(5deg); box-shadow:0 0 15px #ffeb3b;}
-60%{transform:scale(0.85) rotate(-5deg); box-shadow:0 0 25px #ff9800;}
-100%{transform:scale(1);}
-}
-
-/* 🧠 QUIZ (FIXED HEIGHT) */
+/* Quiz Bottom */
 .quizBox{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
 background:white;
-margin:10px;
-padding:15px;
-border-radius:10px;
-flex:1;
-display:flex;
-flex-direction:column;
-justify-content:center;
+padding:12px;
+box-shadow:0 -2px 10px rgba(0,0,0,0.2);
+text-align:center;
 }
 
-/* Effects */
-.correctFlash{
-animation:flashGreen 0.5s;
-}
-@keyframes flashGreen{
-0%{background:#c8e6c9;}
-100%{background:white;}
+/* Center Text */
+#progress{
+font-size:14px;
+margin:2px;
 }
 
-.wrongShake{
-animation:shake 0.4s;
-}
-@keyframes shake{
-0%{transform:translateX(0);}
-25%{transform:translateX(-8px);}
-50%{transform:translateX(8px);}
-75%{transform:translateX(-8px);}
-100%{transform:translateX(0);}
+#question{
+font-size:18px;
+margin:5px 0;
+font-weight:bold;
 }
 
-/* 🔘 BIG QUIZ BUTTONS */
+/* Options - single row */
 .quizOptions{
-display:grid;
-grid-template-columns:repeat(2,1fr);
+display:flex;
+justify-content:center;
 gap:10px;
+margin-top:5px;
 }
 
+/* Buttons */
 .quizOptions button{
+width:60px;
+height:60px;
+border:none;
+border-radius:12px;
 background:#03a9f4;
 color:white;
-border:none;
-border-radius:10px;
-padding:15px;
 font-size:20px;
+font-weight:bold;
 }
 
 /* Result */
 #result{
-font-size:20px;
-margin-top:10px;
+margin-top:5px;
+font-size:15px;
 font-weight:bold;
 }
 
@@ -141,56 +122,39 @@ font-weight:bold;
 
 <body>
 
-<button class="homeBtn" onclick="goHome()">🏠 Home</button>
+<button class="homeBtn" onclick="goHome()">🏠</button>
 
-<header>🔢 Numbers 1-100</header>
+<header>🔢 Numbers Learning</header>
 
 <div class="controls">
-Volume
-<input type="range" id="volume" min="0" max="1" step="0.1" value="1">
-<button onclick="replay()">🔁 Replay</button>
+Level: 1 - 100 |
+Volume <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+<button onclick="replay()">🔁</button>
 </div>
 
 <div class="grid" id="numbers"></div>
 
-<!-- 🧠 QUIZ -->
-<div class="quizBox" id="quizBox">
-<h3>🧠 Exam Mode</h3>
+<!-- Quiz -->
+<div class="quizBox">
+<p id="progress"></p>
 <p id="question"></p>
-
 <div class="quizOptions" id="options"></div>
-
 <p id="result"></p>
-<p id="score"></p>
 </div>
-
-<audio id="correctSound" src="correct.mp3"></audio>
-<audio id="wrongSound" src="wrong.mp3"></audio>
 
 <script>
 
 let grid=document.getElementById("numbers");
 let volume=document.getElementById("volume");
-let quizBox=document.getElementById("quizBox");
 
 let lastNumber=null;
 
 // 🔊 Voice
 function speak(text){
 let msg=new SpeechSynthesisUtterance(text);
-msg.lang="en-US";
 msg.volume=volume.value;
 speechSynthesis.cancel();
 speechSynthesis.speak(msg);
-}
-
-// 🔊 Sound
-function playSound(type){
-let sound=document.getElementById(type+"Sound");
-if(sound){
-sound.currentTime=0;
-sound.play();
-}
 }
 
 // 🔢 Numbers
@@ -201,9 +165,7 @@ div.innerText=i;
 
 div.onclick=function(){
 lastNumber=i;
-div.classList.add("bounce");
 speak(i);
-setTimeout(()=>div.classList.remove("bounce"),600);
 };
 
 grid.appendChild(div);
@@ -211,44 +173,41 @@ grid.appendChild(div);
 
 // 🔁 Replay
 function replay(){
-if(lastNumber){
-speak(lastNumber);
-}
+if(lastNumber) speak(lastNumber);
 }
 
 // 🏠 Home
 function goHome(){
-window.location.href="index.html";
+location.href="index.html";
 }
 
-//////////////////////////////////////////////////
+//////////////////////////////////////////
 // 🧠 QUIZ
 
-let correct;
-let questionCount=0;
+let total=20;
+let current=1;
 let score=0;
-let total=10;
+let correct;
 
 function newQuiz(){
 
-if(questionCount>=total){
-endExam();
+if(current>total){
+endQuiz();
 return;
 }
 
-questionCount++;
+// progress
+document.getElementById("progress").innerText=
+current+" / "+total;
 
+// question
 let q=Math.floor(Math.random()*100)+1;
 correct=q;
 
 document.getElementById("question").innerText=
-"Q"+questionCount+": Find "+q;
+"Find the number: "+q;
 
 document.getElementById("result").innerText="";
-document.getElementById("score").innerText=
-"Score: "+score+" / "+total;
-
-speak(q);
 
 // options
 let options=[q];
@@ -256,6 +215,7 @@ while(options.length<4){
 let n=Math.floor(Math.random()*100)+1;
 if(!options.includes(n)) options.push(n);
 }
+
 options=options.sort(()=>Math.random()-0.5);
 
 let optionsDiv=document.getElementById("options");
@@ -264,11 +224,7 @@ optionsDiv.innerHTML="";
 options.forEach(opt=>{
 let btn=document.createElement("button");
 btn.innerText=opt;
-
-btn.onclick=function(){
-checkAns(opt);
-};
-
+btn.onclick=function(){checkAns(opt)};
 optionsDiv.appendChild(btn);
 });
 }
@@ -276,44 +232,34 @@ optionsDiv.appendChild(btn);
 function checkAns(ans){
 
 if(ans==correct){
-
 score++;
-document.getElementById("result").innerText="✅ Correct!";
-playSound("correct");
+document.getElementById("result").innerText="✅ Correct";
 speak("Correct");
-
-quizBox.classList.add("correctFlash");
-setTimeout(()=>quizBox.classList.remove("correctFlash"),500);
-
-setTimeout(newQuiz,800);
-
 }else{
-
-document.getElementById("result").innerText="❌ Try Again!";
-playSound("wrong");
+document.getElementById("result").innerText="❌ Wrong";
 speak("Wrong");
-
-quizBox.classList.add("wrongShake");
-setTimeout(()=>quizBox.classList.remove("wrongShake"),400);
 }
 
+current++;
+setTimeout(newQuiz,800);
 }
 
-function endExam(){
+function endQuiz(){
 
 document.getElementById("question").innerText="🎉 Finished!";
 document.getElementById("options").innerHTML="";
 
 let msg="";
-if(score>=8) msg="🌟 Excellent!";
-else if(score>=5) msg="👍 Good!";
+if(score>=16) msg="🌟 Excellent!";
+else if(score>=10) msg="👍 Good!";
 else msg="📚 Practice More!";
 
 document.getElementById("result").innerText=
-"Final Score: "+score+" / "+total+" "+msg;
+"Score: "+score+" / "+total+" "+msg;
 
 }
 
+// start
 newQuiz();
 
 </script>
