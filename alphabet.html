@@ -9,13 +9,25 @@
 <style>
 
 body{
-font-family:Arial;
 margin:0;
-background:#fce4ec;
+font-family:Arial;
+background:linear-gradient(135deg,#ff9a9e,#fad0c4);
+display:flex;
+flex-direction:column;
+height:100vh;
+overflow:hidden;
+}
+
+/* Header */
+header{
+background:#e91e63;
+color:white;
+padding:10px;
+font-size:clamp(20px,5vw,30px);
 text-align:center;
 }
 
-/* 🏠 Home Button */
+/* Home */
 .homeBtn{
 position:fixed;
 top:10px;
@@ -23,102 +35,128 @@ left:10px;
 background:#e91e63;
 color:white;
 border:none;
-padding:10px 15px;
+padding:8px 12px;
 border-radius:10px;
-cursor:pointer;
 }
 
-header{
-background:#e91e63;
-color:white;
-padding:15px;
-font-size:24px;
-}
-
+/* 🔤 GRID (4 COLUMN FIXED) */
 .grid{
+flex:1;
 display:grid;
-grid-template-columns:repeat(3,1fr);
+grid-template-columns:repeat(4,1fr);
 gap:10px;
 padding:10px;
+padding-bottom:100px;
+overflow:auto;
 }
 
+/* CARD */
 .card{
 background:#ff4081;
 color:white;
-padding:25px;
 border-radius:15px;
+display:flex;
+justify-content:center;
+align-items:center;
+font-size:clamp(30px,6vw,60px);
+font-weight:bold;
 cursor:pointer;
-transition:0.3s;
+transition:0.2s;
 }
 
+/* HOVER */
 .card:hover{
 transform:scale(1.1);
-background:#ff9800;
 }
 
-.letter{
-font-size:80px;
-font-weight:bold;
-}
-
+/* 🔥 HEAVY BOUNCE */
 .bounce{
-animation:bounce 0.4s;
+animation:bigBounce 0.6s;
 }
 
-@keyframes bounce{
+@keyframes bigBounce{
 0%{transform:scale(1);}
-50%{transform:scale(1.3);}
+25%{transform:scale(1.6) rotate(8deg); box-shadow:0 0 20px yellow;}
+50%{transform:scale(0.7) rotate(-8deg); box-shadow:0 0 30px orange;}
+75%{transform:scale(1.3);}
 100%{transform:scale(1);}
 }
 
-.quiz{
+/* QUIZ (BOTTOM FIXED) */
+.quizBox{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
 background:white;
-margin:10px;
-padding:15px;
-border-radius:10px;
+padding:6px;
+text-align:center;
+box-shadow:0 -2px 10px rgba(0,0,0,0.2);
 }
 
-.quiz button{
+/* TEXT */
+#progress{
+font-size:13px;
+}
+
+#question{
+font-size:16px;
+font-weight:bold;
+}
+
+/* OPTIONS (4 FIXED) */
+.options{
+display:grid;
+grid-template-columns:repeat(4,1fr);
+gap:6px;
+max-width:320px;
+margin:0 auto;
+}
+
+.options button{
+width:100%;
+aspect-ratio:1/1;
+border:none;
+border-radius:10px;
 background:#03a9f4;
 color:white;
-border:none;
-border-radius:8px;
-padding:10px;
+font-size:clamp(14px,4vw,20px);
+font-weight:bold;
+}
+
+/* RESULT */
+#result{
+font-size:14px;
+font-weight:bold;
 }
 
 </style>
-
 </head>
 
 <body>
 
-<!-- 🏠 Back Button -->
-<button class="homeBtn" onclick="goHome()">🏠 Home</button>
+<button class="homeBtn" onclick="goHome()">🏠</button>
 
-<header>
-🔤 Alphabet Learning
-</header>
+<header>🔤 Alphabet Learning</header>
 
 <div class="grid" id="alphabet"></div>
 
-<!-- Quiz -->
-<div class="quiz">
-<h3>🧠 Alphabet Quiz</h3>
-<p id="q"></p>
-
-<div id="options"></div>
-
-<p id="res"></p>
+<!-- QUIZ -->
+<div class="quizBox">
+<p id="progress"></p>
+<p id="question"></p>
+<div class="options" id="options"></div>
+<p id="result"></p>
 </div>
 
 <script>
 
-// 🏠 Back
+// Home
 function goHome(){
-  window.location.href="index.html";
+location.href="index.html";
 }
 
-// 🔊 Voice
+// Voice
 function speak(text){
 let msg=new SpeechSynthesisUtterance(text);
 msg.lang="en-US";
@@ -126,89 +164,110 @@ speechSynthesis.cancel();
 speechSynthesis.speak(msg);
 }
 
-// Data
+// Letters
 let letters="ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
-
 let grid=document.getElementById("alphabet");
 
-// Create Alphabet (ONLY LETTER)
-for(let i=0;i<26;i++){
-
+// Create grid
+letters.forEach(letter=>{
 let div=document.createElement("div");
 div.className="card";
-
-div.innerHTML=
-'<div class="letter">'+letters[i]+'</div>';
+div.innerText=letter;
 
 div.onclick=function(){
 
 div.classList.add("bounce");
+setTimeout(()=>div.classList.remove("bounce"),600);
 
-// 🔊 শুধু letter বলবে
-speak(letters[i]);
-
-setTimeout(()=>div.classList.remove("bounce"),400);
-
+speak(letter);
 };
 
 grid.appendChild(div);
-
-}
-
-//////////////////////////////////////////////////
-// 🧠 QUIZ
-
-let current;
-
-function newQ(){
-
-let i=Math.floor(Math.random()*26);
-current=letters[i];
-
-document.getElementById("q").innerText=
-"Select: " + current;
-
-speak(current);
-
-let optionsDiv=document.getElementById("options");
-optionsDiv.innerHTML="";
-
-// options generate
-let opts=[current,
-letters[(i+1)%26],
-letters[(i+2)%26]];
-
-opts=opts.sort(()=>0.5-Math.random());
-
-opts.forEach(o=>{
-let btn=document.createElement("button");
-btn.innerText=o;
-
-btn.onclick=function(){
-check(o);
-};
-
-optionsDiv.appendChild(btn);
 });
 
-document.getElementById("res").innerText="";
+/////////////////////////////////////
+// QUIZ (20 system)
+
+let total=20;
+let current=1;
+let score=0;
+let correct;
+
+function newQuiz(){
+
+if(current>total){
+endQuiz();
+return;
 }
 
+document.getElementById("progress").innerText=
+current+" / "+total;
+
+// random letter
+correct=letters[Math.floor(Math.random()*26)];
+
+document.getElementById("question").innerText=
+"Find: "+correct;
+
+document.getElementById("result").innerText="";
+
+// options
+let options=[correct];
+while(options.length<4){
+let l=letters[Math.floor(Math.random()*26)];
+if(!options.includes(l)) options.push(l);
+}
+
+options=options.sort(()=>Math.random()-0.5);
+
+let box=document.getElementById("options");
+box.innerHTML="";
+
+options.forEach(opt=>{
+let btn=document.createElement("button");
+btn.innerText=opt;
+
+btn.onclick=function(){
+check(opt);
+};
+
+box.appendChild(btn);
+});
+}
+
+// check
 function check(ans){
 
-if(ans===current){
-document.getElementById("res").innerText="✅ Correct";
+if(ans===correct){
+score++;
+document.getElementById("result").innerText="✅ Correct";
 speak("Correct");
 }else{
-document.getElementById("res").innerText="❌ Wrong";
+document.getElementById("result").innerText="❌ Wrong";
 speak("Wrong");
 }
 
-setTimeout(newQ,1200);
+current++;
+setTimeout(newQuiz,800);
+}
+
+// end
+function endQuiz(){
+
+document.getElementById("question").innerText="🎉 Finished!";
+document.getElementById("options").innerHTML="";
+
+let msg="";
+if(score>=16) msg="🌟 Excellent!";
+else if(score>=10) msg="👍 Good!";
+else msg="📚 Practice More!";
+
+document.getElementById("result").innerText=
+"Score: "+score+" / "+total+" "+msg;
 }
 
 // start
-newQ();
+newQuiz();
 
 </script>
 
