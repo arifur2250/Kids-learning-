@@ -18,6 +18,19 @@ height:100vh;
 overflow:hidden;
 }
 
+/* 🏠 Home Button */
+.homeBtn{
+position:fixed;
+top:10px;
+left:10px;
+background:#ff5722;
+color:white;
+border:none;
+padding:8px 12px;
+border-radius:8px;
+z-index:10;
+}
+
 /* Header */
 header{
 background:#ff9800;
@@ -32,7 +45,7 @@ font-size:18px;
 display:grid;
 grid-template-columns:1fr 1fr;
 gap:8px;
-padding:8px;
+padding:8px 12px;
 }
 
 .top button{
@@ -44,7 +57,7 @@ height:40px;
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:6px;
-padding:6px;
+padding:6px 12px;
 }
 
 .mode{
@@ -62,7 +75,7 @@ border-radius:8px;
 display:grid;
 grid-template-columns:repeat(3,1fr);
 gap:6px;
-padding:6px;
+padding:6px 12px;
 }
 
 .level{
@@ -85,8 +98,8 @@ font-size:14px;
 #game{
 flex:1;
 display:grid;
-gap:6px;
-padding:6px;
+gap:10px;
+padding:10px 14px; /* 👈 margin feel */
 }
 
 /* Card */
@@ -96,8 +109,8 @@ color:white;
 display:flex;
 justify-content:center;
 align-items:center;
-font-size:22px;
-border-radius:8px;
+font-size:24px;
+border-radius:10px;
 }
 
 .open{background:#4caf50;}
@@ -113,6 +126,9 @@ border-radius:8px;
 </head>
 
 <body>
+
+<!-- 🏠 Home -->
+<button class="homeBtn" onclick="goHome()">🏠</button>
 
 <header>🧠 Memory Game PRO MAX</header>
 
@@ -140,6 +156,10 @@ border-radius:8px;
 <div id="game"></div>
 
 <script>
+
+function goHome(){
+  window.location.href="index.html";
+}
 
 let mode="number";
 let level="easy";
