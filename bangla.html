@@ -4,145 +4,321 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>বাংলা বর্ণমালা</title>
+<title>Bangla Learning Pro</title>
 
 <style>
 
 body{
-font-family:"Noto Sans Bengali", Arial;
 margin:0;
-background:#e8f5e9;
-text-align:center;
+font-family:Arial;
+background:#e3f2fd;
+display:flex;
+flex-direction:column;
+height:100vh;
+overflow:hidden;
 }
 
-/* 🏠 Back Button */
+/* Header */
+header{
+background:#ff5722;
+color:white;
+text-align:center;
+padding:10px;
+font-size:clamp(20px,5vw,35px);
+}
+
+/* Home */
 .homeBtn{
 position:fixed;
 top:10px;
 left:10px;
-background:#4caf50;
+background:#ff5722;
 color:white;
 border:none;
-padding:10px 15px;
+padding:8px 12px;
 border-radius:10px;
-cursor:pointer;
 }
 
-header{
+/* Controls */
+.controls{
+background:white;
+padding:5px;
+text-align:center;
+font-size:14px;
+}
+
+/* Mode Buttons */
+.mode{
+display:flex;
+justify-content:center;
+gap:10px;
+padding:8px;
+background:#fff;
+}
+
+.mode button{
+padding:8px 15px;
+border:none;
+border-radius:10px;
 background:#4caf50;
 color:white;
-padding:15px;
-font-size:24px;
+font-weight:bold;
 }
 
+/* GRID */
 .grid{
+flex:1;
 display:grid;
 grid-template-columns:repeat(4,1fr);
 gap:10px;
 padding:10px;
+padding-bottom:120px;
+overflow-y:auto;
 }
 
-.card{
-background:#66bb6a;
+/* BUTTON */
+.number{
+background:#2196f3;
 color:white;
-padding:20px;
 border-radius:15px;
-cursor:pointer;
-transition:0.3s;
-}
-
-.card:hover{
-transform:scale(1.1);
-background:#ff9800;
-}
-
-.letter{
-font-size:32px;
+display:flex;
+justify-content:center;
+align-items:center;
+aspect-ratio:1/1;
+font-size:clamp(18px,5vw,35px);
 font-weight:bold;
+cursor:pointer;
+transition:0.2s;
 }
 
+.number:hover{
+transform:scale(1.1);
+}
+
+/* Bounce */
 .bounce{
-animation:bounce 0.4s;
+animation:bigBounce 0.5s;
 }
 
-@keyframes bounce{
+@keyframes bigBounce{
 0%{transform:scale(1);}
-50%{transform:scale(1.3);}
+30%{transform:scale(1.5) rotate(6deg);}
+60%{transform:scale(0.8) rotate(-6deg);}
 100%{transform:scale(1);}
 }
 
-</style>
+/* Quiz */
+.quizBox{
+position:fixed;
+bottom:0;
+left:0;
+width:100%;
+background:white;
+padding:12px;
+box-shadow:0 -2px 10px rgba(0,0,0,0.2);
+text-align:center;
+}
 
+#progress{font-size:14px;margin:2px;}
+#question{font-size:18px;margin:5px 0;font-weight:bold;}
+
+.quizOptions{
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:5px;
+flex-wrap:wrap;
+}
+
+.quizOptions button{
+width:60px;
+height:60px;
+border:none;
+border-radius:12px;
+background:#03a9f4;
+color:white;
+font-size:20px;
+font-weight:bold;
+}
+
+#result{
+margin-top:5px;
+font-size:15px;
+font-weight:bold;
+}
+
+</style>
 </head>
 
 <body>
 
-<!-- 🏠 Back -->
-<button class="homeBtn" onclick="goHome()">🏠 Home</button>
+<button class="homeBtn" onclick="goHome()">🏠</button>
 
-<header>
-🔡 বাংলা বর্ণমালা
-</header>
+<header>🔤 Bangla Learning</header>
 
-<div class="grid" id="bangla"></div>
+<div class="controls">
+বাংলা অক্ষর |
+Volume <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
+<button onclick="replay()">🔁</button>
+</div>
+
+<!-- ✅ NEW MODE BUTTON -->
+<div class="mode">
+<button onclick="loadSwar()">স্বরবর্ণ</button>
+<button onclick="loadBanjon()">ব্যঞ্জনবর্ণ</button>
+</div>
+
+<div class="grid" id="numbers"></div>
+
+<!-- Quiz -->
+<div class="quizBox">
+<p id="progress"></p>
+<p id="question"></p>
+<div class="quizOptions" id="options"></div>
+<p id="result"></p>
+</div>
 
 <script>
 
-// 🏠 Back
-function goHome(){
-  window.location.href="index.html";
-}
+let grid=document.getElementById("numbers");
+let volume=document.getElementById("volume");
 
-// 🔊 বাংলা Voice
+let lastLetter=null;
+
+// Voice
 function speak(text){
-
 let msg=new SpeechSynthesisUtterance(text);
-msg.lang="bn-BD";  // বাংলা ভয়েস
-msg.rate=0.9;
-
+msg.volume=volume.value;
+msg.lang="bn-BD";
 speechSynthesis.cancel();
 speechSynthesis.speak(msg);
-
 }
 
-// Letters
-let letters=[
-"অ","আ","ই","ঈ","উ","ঊ","ঋ","এ","ঐ","ও","ঔ",
+// 🔤 DATA
+let swar="অ আ ই ঈ উ ঊ এ ঐ ও ঔ".split(" ");
+let banjon="ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড ঢ ণ ত থ দ ধ ন প ফ ব ভ ম য র ল শ ষ স হ".split(" ");
 
-"ক","খ","গ","ঘ","ঙ",
-"চ","ছ","জ","ঝ","ঞ",
-"ট","ঠ","ড","ঢ","ণ",
-"ত","থ","দ","ধ","ন",
-"প","ফ","ব","ভ","ম",
-"য","র","ল","শ","ষ","স","হ",
-"ড়","ঢ়","য়"
-];
+let letters=[];
 
-let grid=document.getElementById("bangla");
+// Load functions
+function loadSwar(){
+letters=swar;
+createGrid();
+}
 
-// Create Cards
-for(let i=0;i<letters.length;i++){
+function loadBanjon(){
+letters=banjon;
+createGrid();
+}
 
+// Create grid
+function createGrid(){
+grid.innerHTML="";
+letters.forEach(letter=>{
 let div=document.createElement("div");
-div.className="card";
-
-div.innerHTML=
-'<div class="letter">'+letters[i]+'</div>';
+div.className="number";
+div.innerText=letter;
 
 div.onclick=function(){
-
 div.classList.add("bounce");
+setTimeout(()=>div.classList.remove("bounce"),500);
 
-// 🔊 শুধু বর্ণ বলবে
-speak(letters[i]);
-
-setTimeout(()=>div.classList.remove("bounce"),400);
-
+lastLetter=letter;
+speak(letter);
 };
 
 grid.appendChild(div);
-
+});
 }
+
+// Replay
+function replay(){
+if(lastLetter) speak(lastLetter);
+}
+
+// Home
+function goHome(){
+location.href="index.html";
+}
+
+//////////////////////////////////////////
+// QUIZ
+
+let total=20;
+let current=1;
+let score=0;
+let correct;
+
+function newQuiz(){
+
+if(letters.length===0) return;
+
+if(current>total){
+endQuiz();
+return;
+}
+
+document.getElementById("progress").innerText=
+current+" / "+total;
+
+correct=letters[Math.floor(Math.random()*letters.length)];
+
+document.getElementById("question").innerText=
+"এই অক্ষরটি খুঁজে বের কর: "+correct;
+
+document.getElementById("result").innerText="";
+
+let options=[correct];
+while(options.length<4){
+let l=letters[Math.floor(Math.random()*letters.length)];
+if(!options.includes(l)) options.push(l);
+}
+
+options=options.sort(()=>Math.random()-0.5);
+
+let optionsDiv=document.getElementById("options");
+optionsDiv.innerHTML="";
+
+options.forEach(opt=>{
+let btn=document.createElement("button");
+btn.innerText=opt;
+btn.onclick=function(){checkAns(opt)};
+optionsDiv.appendChild(btn);
+});
+}
+
+function checkAns(ans){
+
+if(ans==correct){
+score++;
+document.getElementById("result").innerText="✅ ঠিক";
+speak("ঠিক");
+}else{
+document.getElementById("result").innerText="❌ ভুল";
+speak("ভুল");
+}
+
+current++;
+setTimeout(newQuiz,800);
+}
+
+function endQuiz(){
+
+document.getElementById("question").innerText="🎉 শেষ!";
+document.getElementById("options").innerHTML="";
+
+let msg="";
+if(score>=16) msg="🌟 দারুণ!";
+else if(score>=10) msg="👍 ভালো!";
+else msg="📚 আরো প্র্যাকটিস করো!";
+
+document.getElementById("result").innerText=
+"Score: "+score+" / "+total+" "+msg;
+}
+
+// Default load
+loadSwar();
+newQuiz();
 
 </script>
 
