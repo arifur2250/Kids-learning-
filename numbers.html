@@ -1,21 +1,20 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="bn">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Kids Numbers Learning</title>
+<title>Numbers Learning Pro</title>
 
 <style>
 
 body{
 margin:0;
 font-family:Arial;
-background:linear-gradient(135deg,#89f7fe,#66a6ff);
+background:#e3f2fd;
 display:flex;
 flex-direction:column;
 height:100vh;
-overflow:hidden;
 }
 
 /* Header */
@@ -37,6 +36,7 @@ color:white;
 border:none;
 padding:8px 12px;
 border-radius:10px;
+z-index:10;
 }
 
 /* Controls */
@@ -47,95 +47,143 @@ text-align:center;
 font-size:14px;
 }
 
-/* 🔢 Number Grid */
-.grid{
+/* CENTER FIX */
+.gridWrapper{
 flex:1;
+display:flex;
+justify-content:center;
+align-items:flex-start; /* উপরে তুলেছি */
+padding-top:20px;
+padding-bottom:160px; /* নিচে gap */
+}
+
+/* GRID */
+.grid{
 display:grid;
-grid-template-columns:repeat(5,1fr);
-gap:10px;
-padding:10px;
-padding-bottom:90px; /* 🔥 space for quiz */
-overflow:auto;
-}
+grid-template-columns:repeat(4,1fr);
+gap:15px;
 
-/* Number Button */
-.number{
-background:#2196f3;
-color:white;
-padding:18px;
+width:92%;
+max-width:360px;
+
+padding:20px;
+
+background:white;
 border-radius:15px;
-text-align:center;
-font-size:clamp(18px,5vw,30px);
+box-shadow:0 0 20px rgba(0,0,0,0.1);
+
+overflow-y:auto;
+max-height:420px;
+}
+
+/* BUTTON BIGGER */
+.number{
+background:linear-gradient(135deg,#2196f3,#03a9f4);
+color:white;
+display:flex;
+justify-content:center;
+align-items:center;
+
+width:100%;
+height:80px; /* বড় করেছি */
+
+border-radius:14px;
+
+font-size:26px; /* বড় */
+font-weight:bold;
+
 cursor:pointer;
-transition:0.2s;
+transition:all 0.2s ease;
+box-shadow:0 4px 10px rgba(0,0,0,0.2);
+position:relative;
+overflow:hidden;
 }
 
+/* BOUNCE */
+.number:active{
+animation:heavyBounce 0.4s ease;
+}
+
+@keyframes heavyBounce{
+0%{ transform:scale(1); }
+30%{ transform:scale(0.7); }
+60%{ transform:scale(1.2); }
+80%{ transform:scale(0.9); }
+100%{ transform:scale(1); }
+}
+
+/* LIGHT EFFECT */
+.number::after{
+content:"";
+position:absolute;
+width:0;
+height:0;
+background:radial-gradient(circle, rgba(255,255,255,0.9), transparent 60%);
+top:50%;
+left:50%;
+transform:translate(-50%,-50%);
+opacity:0;
+border-radius:50%;
+}
+
+.number:active::after{
+width:180px;
+height:180px;
+opacity:1;
+transition:all 0.3s ease;
+}
+
+/* Hover */
 .number:hover{
-transform:scale(1.1);
+transform:translateY(-5px) scale(1.05);
+box-shadow:0 8px 20px rgba(0,0,0,0.3);
 }
 
-/* Animation */
-.bounce{
-animation:bounceGlow 0.6s;
-}
-
-@keyframes bounceGlow{
-0%{transform:scale(1);}
-30%{transform:scale(1.5) rotate(5deg); box-shadow:0 0 20px #ffeb3b;}
-60%{transform:scale(0.85) rotate(-5deg); box-shadow:0 0 30px #ff9800;}
-100%{transform:scale(1);}
-}
-
-/* 🔥 Quiz Bottom (compact) */
+/* QUIZ */
 .quizBox{
 position:fixed;
 bottom:0;
 left:0;
 width:100%;
 background:white;
-padding:6px;
+padding:12px;
 box-shadow:0 -2px 10px rgba(0,0,0,0.2);
 text-align:center;
 }
 
-/* Text */
 #progress{
-font-size:13px;
+font-size:14px;
 margin:2px;
 }
 
 #question{
-font-size:16px;
+font-size:18px;
+margin:5px 0;
 font-weight:bold;
-margin:2px;
 }
 
-/* ✅ ALWAYS 4 BUTTON */
 .quizOptions{
-display:grid;
-grid-template-columns:repeat(4,1fr);
-gap:6px;
-max-width:320px;
-margin:0 auto;
+display:flex;
+justify-content:center;
+gap:10px;
+margin-top:5px;
 }
 
-/* Buttons */
 .quizOptions button{
-width:100%;
-aspect-ratio:1/1;
+width:70px;
+height:70px;
 border:none;
-border-radius:10px;
+border-radius:12px;
 background:#03a9f4;
 color:white;
-font-size:clamp(14px,4vw,20px);
+font-size:22px;
 font-weight:bold;
 }
 
-/* Result */
 #result{
-font-size:14px;
+margin-top:5px;
+font-size:15px;
 font-weight:bold;
-margin-top:3px;
 }
 
 </style>
@@ -145,16 +193,18 @@ margin-top:3px;
 
 <button class="homeBtn" onclick="goHome()">🏠</button>
 
-<header>🔢 Kids Numbers</header>
+<header>🔢 Numbers Learning</header>
 
 <div class="controls">
+Level: 1 - 100 |
 Volume <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
 <button onclick="replay()">🔁</button>
 </div>
 
-<div class="grid" id="numbers"></div>
+<div class="gridWrapper">
+  <div class="grid" id="numbers"></div>
+</div>
 
-<!-- Quiz -->
 <div class="quizBox">
 <p id="progress"></p>
 <p id="question"></p>
@@ -166,10 +216,9 @@ Volume <input type="range" id="volume" min="0" max="1" step="0.1" value="1">
 
 let grid=document.getElementById("numbers");
 let volume=document.getElementById("volume");
-
 let lastNumber=null;
 
-// Voice
+/* Voice */
 function speak(text){
 let msg=new SpeechSynthesisUtterance(text);
 msg.volume=volume.value;
@@ -177,7 +226,7 @@ speechSynthesis.cancel();
 speechSynthesis.speak(msg);
 }
 
-// Numbers
+/* Numbers */
 for(let i=1;i<=100;i++){
 let div=document.createElement("div");
 div.className="number";
@@ -185,28 +234,24 @@ div.innerText=i;
 
 div.onclick=function(){
 lastNumber=i;
-
-div.classList.add("bounce");
-setTimeout(()=>div.classList.remove("bounce"),600);
-
 speak(i);
 };
 
 grid.appendChild(div);
 }
 
-// Replay
+/* Replay */
 function replay(){
 if(lastNumber) speak(lastNumber);
 }
 
-// Home
+/* Home */
 function goHome(){
 location.href="index.html";
 }
 
-// QUIZ
-let total=20;
+/* QUIZ */
+let total=10;
 let current=1;
 let score=0;
 let correct;
@@ -225,7 +270,7 @@ let q=Math.floor(Math.random()*100)+1;
 correct=q;
 
 document.getElementById("question").innerText=
-"Find the number: "+q;
+"Find: "+q;
 
 document.getElementById("result").innerText="";
 
@@ -269,8 +314,8 @@ document.getElementById("question").innerText="🎉 Finished!";
 document.getElementById("options").innerHTML="";
 
 let msg="";
-if(score>=16) msg="🌟 Excellent!";
-else if(score>=10) msg="👍 Good!";
+if(score>=8) msg="🌟 Excellent!";
+else if(score>=5) msg="👍 Good!";
 else msg="📚 Practice More!";
 
 document.getElementById("result").innerText=
