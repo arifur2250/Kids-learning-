@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Kids Word Game Pro</title>
+
+<style>
+body{margin:0;font-family:sans-serif;background:#eef6ff;text-align:center;}
+header{background:#2196f3;color:white;padding:12px;font-size:22px;}
+.container{max-width:500px;margin:auto;padding:15px;}
+.card{background:white;border-radius:15px;padding:15px;box-shadow:0 0 10px rgba(0,0,0,0.2);}
+#emoji{font-size:90px;margin:10px;cursor:pointer;}
+.letters,.answer{display:flex;justify-content:center;flex-wrap:wrap;gap:10px;margin-top:10px;}
+.btn{padding:12px;min-width:50px;font-size:20px;background:#ff9800;color:white;border:none;border-radius:10px;cursor:pointer;}
+.answer .btn{background:#4caf50;}
+#message{margin-top:10px;font-size:20px;font-weight:bold;}
+.hint{background:#9c27b0;}
+.next{background:#009688;}
+.home{background:#e91e63;}
+</style>
+</head>
+
+<body>
+
+<header>🎮 Kids Word Learning Game</header>
+
+<div class="container">
+<div class="card">
+
+<h2 id="title"></h2>
+
+<!-- ✅ emoji show -->
+<div id="emoji" onclick="speakWord()"></div>
+
+<div class="answer" id="answer"></div>
+<div class="letters" id="letters"></div>
+
+<div id="message"></div>
+
+<button class="btn hint"
+onmousedown="showHint()" onmouseup="hideHint()"
+ontouchstart="showHint()" ontouchend="hideHint()">👀 Hint</button>
+
+<button class="btn next" onclick="nextWord()">➡️ Next</button>
+<button class="btn home" onclick="resetCurrent()">🔄 Reset</button>
+
+</div>
+</div>
+
+<script>
+
+// ✅ EMOJI DATA
+let words = [
+  {word:"APPLE", emoji:"🍎"},
+  {word:"BALL", emoji:"⚽"},
+  {word:"CAT", emoji:"🐱"},
+  {word:"DOG", emoji:"🐶"},
+  {word:"ELEPHANT", emoji:"🐘"},
+  {word:"FISH", emoji:"🐟"},
+  {word:"GOAT", emoji:"🐐"},
+  {word:"HAT", emoji:"🎩"},
+  {word:"ICE", emoji:"🧊"},
+  {word:"JUG", emoji:"🫗"},
+  {word:"KITE", emoji:"🪁"},
+  {word:"LION", emoji:"🦁"},
+  {word:"MANGO", emoji:"🥭"},
+  {word:"NEST", emoji:"🪺"},
+  {word:"ORANGE", emoji:"🍊"},
+  {word:"PEN", emoji:"🖊️"},
+  {word:"QUEEN", emoji:"👑"},
+  {word:"RAT", emoji:"🐀"},
+  {word:"SUN", emoji:"☀️"},
+  {word:"TIGER", emoji:"🐯"},
+  {word:"UMBRELLA", emoji:"☂️"},
+  {word:"VAN", emoji:"🚐"},
+  {word:"WATCH", emoji:"⌚"},
+  {word:"XYLOPHONE", emoji:"🎼"},
+  {word:"YAK", emoji:"🐂"},
+  {word:"ZEBRA", emoji:"🦓"}
+];
+
+let index = 0;
+let selected = "";
+
+// render
+function render(){
+    let data = words[index];
+
+    document.getElementById("title").innerText = data.word[0] + " for ?";
+    document.getElementById("emoji").innerText = data.emoji;
+
+    selected="";
+    document.getElementById("answer").innerHTML="";
+    document.getElementById("message").innerText="";
+
+    let letters = shuffle(data.word);
+    let lettersDiv = document.getElementById("letters");
+    lettersDiv.innerHTML="";
+
+    letters.forEach(l=>{
+        let b=document.createElement("button");
+        b.className="btn";
+        b.innerText=l;
+        b.onclick=()=>{
+            selected += l;
+            updateAnswer();
+            speakLetter(l);
+            check();
+        }
+        lettersDiv.appendChild(b);
+    });
+}
+
+// shuffle
+function shuffle(word){
+    return word.split('').sort(()=>Math.random()-0.5);
+}
+
+// update answer
+function updateAnswer(){
+    let ans=document.getElementById("answer");
+    ans.innerHTML="";
+    selected.split('').forEach(l=>{
+        let d=document.createElement("div");
+        d.className="btn";
+        d.innerText=l;
+        ans.appendChild(d);
+    });
+}
+
+// check
+function check(){
+    let correct = words[index].word;
+
+    if(selected === correct){
+        showMessage("🎉 Excellent!", "green");
+        speak(correct[0] + " for " + correct);
+        confetti();
+    } 
+    else if(selected.length >= correct.length){
+        showMessage("❌ Try again", "red");
+        speak("Try again");
+        setTimeout(resetCurrent,1000);
+    }
+}
+
+// reset
+function resetCurrent(){
+    selected="";
+    document.getElementById("answer").innerHTML="";
+    document.getElementById("message").innerText="";
+    render();
+}
+
+// next
+function nextWord(){
+    index++;
+    if(index < words.length){
+        render();
+    }else{
+        showMessage("🎉 All Completed!", "green");
+    }
+}
+
+// voice
+function speakWord(){
+    let word = words[index].word;
+    speak(word[0] + " for " + word);
+}
+
+// hint
+function showHint(){
+    let word = words[index].word;
+    document.getElementById("title").innerText = word;
+    speak(word[0] + " for " + word);
+}
+
+function hideHint(){
+    document.getElementById("title").innerText = words[index].word[0] + " for ?";
+}
+
+// speech
+function speak(text){
+    let msg=new SpeechSynthesisUtterance(text);
+    msg.lang="en-US";
+    speechSynthesis.speak(msg);
+}
+
+function speakLetter(l){
+    let msg=new SpeechSynthesisUtterance(l);
+    msg.lang="en-US";
+    speechSynthesis.speak(msg);
+}
+
+// animation
+function confetti(){
+    document.body.style.background="#c8ffc8";
+    setTimeout(()=>document.body.style.background="#eef6ff",500);
+}
+
+// message
+function showMessage(msg, color){
+    document.getElementById("message").innerText = msg;
+    document.getElementById("message").style.color = color;
+}
+
+render();
+
+</script>
+
+</body>
+</html>
